@@ -8,8 +8,10 @@ use App\Models\Image;
 use Filament\Resources\Form;
 use Filament\Resources\Table;
 use Filament\Resources\Resource;
+use Filament\Forms\Components\Card;
 use Filament\Tables\Filters\Filter;
 use Livewire\TemporaryUploadedFile;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
@@ -36,19 +38,30 @@ class ImageResource extends Resource
 
         return $form
             ->schema([
-                TextInput::make('title'),
-                RichEditor::make('description'),
-                FileUpload::make('url')
-                    ->image()
-                    ->imageResizeMode('cover')
-                    ->imageCropAspectRatio('16:9')
-                    ->imageResizeTargetWidth('300')
-                    ->getUploadedFileNameForStorageUsing(
-                        function (TemporaryUploadedFile $file): string {
-                            return (string) str($file->getClientOriginalName())->prepend('test-');
-                        }
-                    )
-            ]);
+                Card::make()
+                    ->schema([
+                        Select::make('category_id')
+                        ->relationship('category', 'name')
+                        ->label('images.category')
+                        ->translateLabel(),
+                        TextInput::make('title')
+                        ->label('images.title')
+                        ->translateLabel(),
+                        RichEditor::make('description')
+                        ->label('images.description')
+                        ->translateLabel(),
+                        FileUpload::make('url')
+                            ->image()
+                            ->imageResizeMode('cover')
+                            ->imageCropAspectRatio('16:9')
+                            ->imageResizeTargetWidth('300')
+                            ->getUploadedFileNameForStorageUsing(
+                                function (TemporaryUploadedFile $file): string {
+                                    return (string) str($file->getClientOriginalName())->prepend('test-');
+                                }
+                            )
+                    ])
+                ]);
     }
 
     public static function table(Table $table): Table
@@ -56,10 +69,10 @@ class ImageResource extends Resource
 
         return $table
             ->columns([
-
-                TextColumn::make('title')->sortable(),
-                TextColumn::make('description'),
-                ImageColumn::make('url')->circular()
+                TextColumn::make('category.name')->label('images.category')->translateLabel(),
+                TextColumn::make('title') ->label('images.title')->translateLabel()->sortable(),
+                TextColumn::make('description')->label('images.description')->translateLabel(),
+                ImageColumn::make('url')->circular(),
 
             ])
             ->filters([

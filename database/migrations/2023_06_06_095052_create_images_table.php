@@ -19,7 +19,9 @@ return new class () extends Migration {
 
             //$table->integer('order');
 
-            $table->integer('order')->default(0)->change();
+            //$table->integer('order')->default(0)->change();
+
+            $table->integer('category_id')->nullable();
 
         });
     }
